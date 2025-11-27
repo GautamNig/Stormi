@@ -26,7 +26,7 @@ const Header = () => {
     return (
       <header className="header">
         <div className="header-content">
-          <div className="logo">Your App Name</div>
+          <div className="logo">Stormi - Don't push my buttons.</div>
           <div>Loading...</div>
         </div>
       </header>
@@ -36,7 +36,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="header-content">
-        <div className="logo">Your App Name</div>
+        <div className="logo">Stormi - Don't push my buttons.</div>
         
         <div className="auth-section">
           {user ? (

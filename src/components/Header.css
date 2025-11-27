@@ -8,6 +8,8 @@
   z-index: 1000;
 }
 
+/* Rest of the header styles remain the same */
+
 .header-content {
   display: flex;
   justify-content: space-between;
