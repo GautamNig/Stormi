@@ -26,7 +26,7 @@ export default function AIChatTooltip({ message, onExpire }) {
 
     // Position tooltip on the right side of the screen, pointing towards the animation
     const tooltipStyle = {
-        right: '50px', // Position from right edge
+        right: '840px', // Position from right edge
         top: '40vh', // Center vertically
         transform: 'translateY(-50%)' // Center vertically
     };

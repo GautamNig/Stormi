@@ -26,36 +26,36 @@
 /* TOOLTIP POINTER - POINTING LEFT AND DOWN (8 O'CLOCK DIRECTION) */
 .tooltip-pointer {
     position: absolute;
-    left: -10px;
+    right: -10px;
     top: 60%;
     transform: translateY(-30%);
     width: 0;
     height: 0;
     border-top: 8px solid transparent;
     border-bottom: 8px solid transparent;
-    border-right: 10px solid #8B5CF6;
+    border-left: 10px solid #8B5CF6;
     filter: drop-shadow(-2px 0 2px rgba(0, 0, 0, 0.1));
 }
 
 /* EMOTION-SPECIFIC POINTER COLORS */
 .ai-chat-tooltip.emotion-happy .tooltip-pointer {
-    border-right-color: #FFD93D;
+    border-left-color: #FFD93D;
 }
 
 .ai-chat-tooltip.emotion-excited .tooltip-pointer {
-    border-right-color: #FF6B6B;
+    border-left-color: #FF6B6B;
 }
 
 .ai-chat-tooltip.emotion-smiling .tooltip-pointer {
-    border-right-color: #4ADE80;
+    border-left-color: #4ADE80;
 }
 
 .ai-chat-tooltip.emotion-angry .tooltip-pointer {
-    border-right-color: #EF4444;
+    border-left-color: #EF4444;
 }
 
 .ai-chat-tooltip.emotion-neutral .tooltip-pointer {
-    border-right-color: #6B7280;
+    border-left-color: #6B7280;
 }
 
 /* EMOTION-SPECIFIC STYLES */
