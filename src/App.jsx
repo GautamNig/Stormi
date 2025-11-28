@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useState } from 'react';
 import Header from './components/Header';
 import FacialExpression from './components/FacialExpression';
@@ -8,6 +9,7 @@ import useChatMessages from './hooks/useChatMessages';
 import useFacialExpression from './hooks/useFacialExpression';
 import './App.css';
 import UserStatistics from './components/UserStatistics';
+import AllUsersStatistics from './components/AllUsersStatistics';
 import AnimationAttribution from './components/AnimationAttribution';
 
 export default function App() {
@@ -19,13 +21,15 @@ export default function App() {
     removeChatMessage 
   } = useChatMessages();
   
-  // Use the facial expression hook ONLY in App component
   const { 
     RiveComponent, 
     currentExpression, 
     riveLoaded, 
     setExpression 
   } = useFacialExpression();
+
+  // Add state for active tab
+  const [activeTab, setActiveTab] = useState('chat'); // 'chat', 'all-stats'
 
   console.log('🔄 App - Rive loaded:', riveLoaded, 'Current expression:', currentExpression);
 
@@ -41,7 +45,6 @@ export default function App() {
       console.log('🔄 Animating facial expression:', aiResponse.emotion);
       console.log('📊 Rive loaded status:', riveLoaded);
       
-      // Animate facial expression based on AI emotion
       if (aiResponse && aiResponse.emotion && riveLoaded) {
         setExpression(aiResponse.emotion);
         console.log('✅ Expression set:', aiResponse.emotion);
@@ -70,24 +73,32 @@ export default function App() {
   return (
     <div className="App">
       <Header />
-<UserStatistics /> {/* Add this line */}
       
+      {/* Tab Navigation - ALWAYS show when user is logged in */}
+      {user && (
+        <div className="tab-navigation">
+          <button 
+            className={`tab-button ${activeTab === 'chat' ? 'active' : ''}`}
+            onClick={() => setActiveTab('chat')}
+          >
+            💬 Chat
+          </button>
+          <button 
+            className={`tab-button ${activeTab === 'all-stats' ? 'active' : ''}`}
+            onClick={() => setActiveTab('all-stats')}
+          >
+            📊 All Users Stats
+          </button>
+        </div>
+      )}
+
+      {/* Tab Content */}
       <main className="main-content">
-        {user ? (
-          <div className="welcome-section">
-            <FacialExpression 
-              RiveComponent={RiveComponent}
-              currentExpression={currentExpression}
-              riveLoaded={riveLoaded}
-              setExpression={setExpression}
-            />
-          </div>
-        ) : (
-          <div className="landing-section">
-            <div className="hero-content">
-              <h1>Interactive AI Companion</h1>
-              <p>Sign in to chat with an AI that responds with emotions and facial expressions!</p>
-              <div className="demo-preview">
+        {activeTab === 'chat' && (
+          user ? (
+            <div className="chat-section">
+              {/* UserStatistics is now INSIDE the chat section, below the animation */}
+              <div className="animation-section">
                 <FacialExpression 
                   RiveComponent={RiveComponent}
                   currentExpression={currentExpression}
@@ -95,13 +106,37 @@ export default function App() {
                   setExpression={setExpression}
                 />
               </div>
+              <div className="user-stats-section">
+                <UserStatistics />
+              </div>
             </div>
+          ) : (
+            <div className="landing-section">
+              <div className="hero-content">
+                <h1>Interactive AI Companion</h1>
+                <p>Sign in to chat with an AI that responds with emotions and facial expressions!</p>
+                <div className="demo-preview">
+                  <FacialExpression 
+                    RiveComponent={RiveComponent}
+                    currentExpression={currentExpression}
+                    riveLoaded={riveLoaded}
+                    setExpression={setExpression}
+                  />
+                </div>
+              </div>
+            </div>
+          )
+        )}
+
+        {activeTab === 'all-stats' && (
+          <div className="all-stats-section">
+            <AllUsersStatistics />
           </div>
         )}
       </main>
 
-       {/* AI Chat Tooltips */}
-      {chatMessages.map(message => (
+      {/* AI Chat Tooltips - Only show in chat tab */}
+      {activeTab === 'chat' && chatMessages.map(message => (
         <AIChatTooltip
           key={message.id}
           message={message}
@@ -109,17 +144,19 @@ export default function App() {
         />
       ))}
 
-      {/* Chat Input */}
-      <ChatInput 
-        onSendMessage={handleSendMessage}
-        disabled={!user || isLoading}
-      />
+      {/* Chat Input - Only show in chat tab */}
+      {activeTab === 'chat' && (
+        <ChatInput 
+          onSendMessage={handleSendMessage}
+          disabled={!user || isLoading}
+        />
+      )}
 
-      {/* Animation Attribution */}
+      {/* Animation Attribution - Show in all tabs */}
       <AnimationAttribution />
 
-      {/* Loading indicator for AI responses */}
-      {isLoading && (
+      {/* Loading indicator for AI responses - Only show in chat tab */}
+      {activeTab === 'chat' && isLoading && (
         <div className="ai-loading-indicator">
           <div className="ai-typing-dots">
             <span></span>
