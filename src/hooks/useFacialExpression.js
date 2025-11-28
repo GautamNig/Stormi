@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRive } from '@rive-app/react-webgl2';
+import { ChatConfig } from '../config/chatConfig'; // Add this import
 
 export default function useFacialExpression() {
     const [currentExpression, setCurrentExpression] = useState('neutral');
     const [riveLoaded, setRiveLoaded] = useState(false);
     const [availableInputs, setAvailableInputs] = useState([]);
     const expressionQueue = useRef([]);
+    const neutralTimeoutRef = useRef(null); // Add timeout reference
 
     const { RiveComponent, rive } = useRive({
         src: `${import.meta.env.BASE_URL}rive/21685-40697-girl-gfacial-expression.riv`,
@@ -14,7 +16,6 @@ export default function useFacialExpression() {
         onLoad: () => {
             console.log('✅ Rive facial expression animation loaded');
             setRiveLoaded(true);
-            // Process any queued expressions
             processExpressionQueue();
         },
         onLoadError: (error) => {
@@ -23,9 +24,14 @@ export default function useFacialExpression() {
         },
     });
 
+    // Cleanup timeout on unmount
     useEffect(() => {
-  console.log('🔄 useFacialExpression - Rive loaded:', riveLoaded, 'Rive instance:', !!rive);
-}, [riveLoaded, rive]);
+        return () => {
+            if (neutralTimeoutRef.current) {
+                clearTimeout(neutralTimeoutRef.current);
+            }
+        };
+    }, []);
 
     // Get and log all available inputs when Rive loads
     useEffect(() => {
@@ -68,6 +74,20 @@ export default function useFacialExpression() {
         };
     };
 
+    // NEW: Function to schedule return to neutral
+    const scheduleReturnToNeutral = () => {
+        // Clear any existing timeout
+        if (neutralTimeoutRef.current) {
+            clearTimeout(neutralTimeoutRef.current);
+        }
+
+        // Schedule return to neutral after cooldown period
+        neutralTimeoutRef.current = setTimeout(() => {
+            console.log('⏰ Returning to neutral expression after cooldown');
+            setExpressionInternal('neutral');
+        }, ChatConfig.COOLDOWN_PERIOD);
+    };
+
     // Set expression internally (when Rive is loaded)
     const setExpressionInternal = (expression) => {
         if (!rive) {
@@ -97,6 +117,12 @@ export default function useFacialExpression() {
                         setCurrentExpression(expression);
                         console.log('🎭 Expression set successfully:', expression, 
                                    `(Expression: ${mapping.expressionValue}, Pressing: ${mapping.pressingValue})`);
+                        
+                        // Schedule return to neutral if it's not already neutral
+                        if (expression !== 'neutral') {
+                            scheduleReturnToNeutral();
+                        }
+                        
                         return true;
                     } else {
                         console.warn('❌ Required inputs not found');
@@ -127,6 +153,14 @@ export default function useFacialExpression() {
         return setExpressionInternal(expression);
     };
 
+    // NEW: Function to manually return to neutral (useful for cleanup)
+    const returnToNeutral = () => {
+        if (neutralTimeoutRef.current) {
+            clearTimeout(neutralTimeoutRef.current);
+        }
+        setExpressionInternal('neutral');
+    };
+
     // Process queue when Rive becomes available
     useEffect(() => {
         if (riveLoaded && rive) {
@@ -140,6 +174,7 @@ export default function useFacialExpression() {
         currentExpression,
         riveLoaded,
         setExpression,
+        returnToNeutral, // Export the manual neutral function
         availableInputs,
         isSettingExpression: false
     };

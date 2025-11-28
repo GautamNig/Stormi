@@ -9,12 +9,12 @@ export default function AIChatTooltip({ message, onExpire }) {
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsFading(true);
-        }, 4500); // Start fade out 500ms before removal
+        }, ChatConfig.COOLDOWN_PERIOD - 500); // Start fade out 500ms before removal
 
         const removeTimer = setTimeout(() => {
             setIsVisible(false);
             onExpire(message.id);
-        }, ChatConfig.COOLDOWN_PERIOD); // Remove after 5 seconds
+        }, ChatConfig.COOLDOWN_PERIOD);
 
         return () => {
             clearTimeout(timer);
