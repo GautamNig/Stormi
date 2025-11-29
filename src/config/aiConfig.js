@@ -1,29 +1,87 @@
+// config/aiConfig.js (FIX Hugging Face)
 export const AIConfig = {
-    // OpenRouter Free DeepSeek
-    OPENROUTER_API_KEY: import.meta.env.VITE_OPENROUTER_API_KEY,
-    OPENROUTER_MODEL: 'deepseek/deepseek-chat',
-    OPENROUTER_BASE_URL: 'https://openrouter.ai/api/v1',
-    
-    // Free rate limits
-    RATE_LIMIT: {
-        REQUESTS_PER_MINUTE: 5,
-        COOLDOWN_MS: 12000 // 12 seconds between requests
+    PROVIDERS: {
+        OPENROUTER: {
+            name: 'OpenRouter',
+            enabled: true,
+            priority: 1,
+            baseUrl: 'https://openrouter.ai/api/v1',
+            apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
+            model: 'meta-llama/llama-3.1-8b-instruct',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${import.meta.env.VITE_OPENROUTER_API_KEY}`,
+                'HTTP-Referer': window.location.origin,
+                'X-Title': 'Emotional AI Companion'
+            }
+        },
+    //      TOGETHER: {
+    //     name: 'Together AI',
+    //     enabled: true,
+    //     priority: 2,
+    //     baseUrl: 'https://api.together.xyz/v1',
+    //     apiKey: import.meta.env.VITE_TOGETHER_API_KEY,
+    //     model: 'mistralai/Mixtral-8x7B-Instruct-v0.1',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${import.meta.env.VITE_TOGETHER_API_KEY}`
+    //     }
+    // },
+    // PERPLEXITY: {
+    //     name: 'Perplexity',
+    //     enabled: false, // Enable if you get API key
+    //     priority: 3,
+    //     baseUrl: 'https://api.perplexity.ai',
+    //     apiKey: import.meta.env.VITE_PERPLEXITY_API_KEY,
+    //     model: 'sonar-small-chat',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${import.meta.env.VITE_PERPLEXITY_API_KEY}`
+    //     }
+    // },
+    HUGGINGFACE: {
+        name: 'Hugging Face',
+        enabled: false, // Disable until we fix CORS
+        priority: 4,
+        baseUrl: 'https://api-inference.huggingface.co/models',
+        apiKey: import.meta.env.VITE_HUGGINGFACE_API_KEY,
+        model: 'microsoft/DialoGPT-medium',
+        headers: {
+            'Authorization': `Bearer ${import.meta.env.VITE_HUGGINGFACE_API_KEY}`,
+            'Content-Type': 'application/json'
+        }
+    },
+    //     DEEPSEEK: {
+    //         name: 'DeepSeek',
+    //         enabled: true,
+    //         priority: 3,
+    //         baseUrl: 'https://api.deepseek.com/v1',
+    //         apiKey: import.meta.env.VITE_DEEPSEEK_API_KEY,
+    //         model: 'deepseek-chat',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             'Authorization': `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`
+    //         }
+    //     },
+    //         GROQ: {
+    //     name: 'Groq',
+    //     enabled: false, // Enable if you get API key
+    //     priority: 4,
+    //     baseUrl: 'https://api.groq.com/openai/v1',
+    //     apiKey: import.meta.env.VITE_GROQ_API_KEY,
+    //     model: 'llama2-70b-4096',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Authorization': `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
+    //     }
+    // },
     },
     
-    // Emotion mapping
-    EMOTION_MAP: {
-        'happy': 'happy',
-        'joy': 'happy',
-        'excited': 'excited', 
-        'excitement': 'excited',
-        'smiling': 'smiling',
-        'smile': 'smiling',
-        'angry': 'angry',
-        'anger': 'angry',
-        'mad': 'angry',
-        'frustrated': 'angry',
-        'neutral': 'neutral',
-        'calm': 'neutral',
-        'default': 'neutral'
+    MAX_TOKENS: 150,
+    TEMPERATURE: 0.7,
+    STREAM: false,
+    
+    RATE_LIMIT: {
+        REQUESTS_PER_MINUTE: 10
     }
 };
