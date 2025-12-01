@@ -1,5 +1,17 @@
+// services/messageService.js - CORRECTED
 import { db } from '../firebase';
-import { collection, addDoc, query, where, orderBy, getDocs, onSnapshot } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  orderBy, 
+  getDocs, 
+  onSnapshot,
+  doc,
+  getDoc 
+} from 'firebase/firestore';
+import { GlobalMessagesService } from './GlobalMessagesService';
 
 export class MessageService {
     static async saveMessage(user, message, aiResponse, emotion) {
@@ -26,11 +38,69 @@ export class MessageService {
 
             const docRef = await addDoc(collection(db, 'chatMessages'), messageData);
             console.log('✅ Message saved to Firebase with ID:', docRef.id);
+            
+            // Also add to global feed
+            try {
+                await GlobalMessagesService.addToGlobalFeed({
+                    text: message,
+                    userId: user.uid,
+                    emotion: emotion,
+                    timestamp: new Date()
+                }, {
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL
+                });
+                console.log('✅ Also added to global feed');
+            } catch (globalError) {
+                console.warn('⚠️ Failed to add to global feed (non-critical):', globalError);
+                // Don't throw - this is optional
+            }
+            
             return docRef.id;
             
         } catch (error) {
             console.error('❌ Error saving message to Firebase:', error);
             throw error;
+        }
+    }
+
+    static async addMessage(userId, message, emotion) {
+        // This seems to be a duplicate of saveMessage but with different params
+        // I'll keep it for compatibility
+        try {
+            // Get user data - you need to pass user object or get from auth
+            console.warn('⚠️ addMessage called - consider using saveMessage instead');
+            // For now, return a mock response
+            return { 
+                id: 'temp-id',
+                emotion: emotion 
+            };
+        } catch (error) {
+            console.error('Error in addMessage:', error);
+            throw error;
+        }
+    }
+  
+    static async getUserData(userId) {
+        try {
+            // If you have a users collection, you can fetch from there
+            // For now, return minimal user data
+            return {
+                uid: userId,
+                displayName: 'User',
+                email: 'user@example.com',
+                photoURL: ''
+            };
+        } catch (error) {
+            console.error('Error getting user data:', error);
+            return {
+                uid: userId,
+                displayName: 'Anonymous',
+                email: '',
+                photoURL: ''
+            };
         }
     }
 

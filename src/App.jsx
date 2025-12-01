@@ -12,21 +12,25 @@ import './App.css';
 import UserStatistics from './components/UserStatistics';
 import AllUsersStatistics from './components/AllUsersStatistics';
 import AnimationAttribution from './components/AnimationAttribution';
+import Leaderboard from './components/Leaderboard';
+import IndexHelper from './components/IndexHelper';
+import GlobalMessagesTab from './components/GlobalMessagesTab';
+import { MessageService } from './services/MessageService';
 
 export default function App() {
     const { user, loading } = useAuth();
-    const { 
-        chatMessages, 
-        isLoading, 
-        addChatMessage, 
-        removeChatMessage 
+    const {
+        chatMessages,
+        isLoading,
+        addChatMessage,
+        removeChatMessage
     } = useChatMessages();
-    
-    const { 
-        RiveComponent, 
-        currentExpression, 
-        riveLoaded, 
-        setExpression 
+
+    const {
+        RiveComponent,
+        currentExpression,
+        riveLoaded,
+        setExpression
     } = useFacialExpression();
 
     // Move TTS hook to App level - single instance
@@ -36,29 +40,33 @@ export default function App() {
 
     console.log('🔄 App - Rive loaded:', riveLoaded, 'Current expression:', currentExpression);
 
-    const handleSendMessage = async (message) => {
-        if (!user) {
-            alert('Please sign in to chat with the AI companion!');
-            return;
-        }
+   const handleSendMessage = async (message) => {
+    if (!user) {
+        alert('Please sign in to chat with the AI companion!');
+        return;
+    }
 
-        try {
-            const aiResponse = await addChatMessage(message, user);
-            
-            console.log('🔄 Animating facial expression:', aiResponse.emotion);
-            console.log('📊 Rive loaded status:', riveLoaded);
-            
-            if (aiResponse && aiResponse.emotion && riveLoaded) {
-                setExpression(aiResponse.emotion);
-                console.log('✅ Expression set:', aiResponse.emotion);
-            } else {
-                console.log('❌ Cannot set expression - Rive not loaded or no emotion');
-            }
-            
-        } catch (error) {
-            console.error('Error in chat flow:', error);
+    try {
+        // Use the original addChatMessage from your hook
+        const aiResponse = await addChatMessage(message, user);
+        
+        console.log('🔄 Animating facial expression:', aiResponse.emotion);
+        console.log('📊 Rive loaded status:', riveLoaded);
+        
+        if (aiResponse && aiResponse.emotion && riveLoaded) {
+            setExpression(aiResponse.emotion);
+            console.log('✅ Expression set:', aiResponse.emotion);
+        } else {
+            console.log('❌ Cannot set expression - Rive not loaded or no emotion');
         }
-    };
+        
+        return aiResponse;
+        
+    } catch (error) {
+        console.error('Error in chat flow:', error);
+        throw error;
+    }
+};
 
     const handleTooltipExpire = (messageId) => {
         removeChatMessage(messageId);
@@ -76,11 +84,11 @@ export default function App() {
     return (
         <div className="App">
             <Header />
-            
+
             {/* TTS Controls */}
             {isAvailable && (
                 <div className="tts-controls">
-                    <button 
+                    <button
                         className={`tts-toggle ${isMuted ? 'muted' : ''}`}
                         onClick={toggleMute}
                         title={isMuted ? 'Unmute voice' : 'Mute voice'}
@@ -89,67 +97,67 @@ export default function App() {
                     </button>
                 </div>
             )}
-            
+
             {/* Tab Navigation */}
             {user && (
-                <div className="tab-navigation">
-                    <button 
-                        className={`tab-button ${activeTab === 'chat' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('chat')}
-                    >
-                        💬 Chat
-                    </button>
-                    <button 
-                        className={`tab-button ${activeTab === 'all-stats' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('all-stats')}
-                    >
-                        📊 All Users Stats
-                    </button>
-                </div>
-            )}
+  <div className="tab-navigation">
+    <button 
+      className={`tab-button ${activeTab === 'chat' ? 'active' : ''}`}
+      onClick={() => setActiveTab('chat')}
+    >
+      💬 Chat
+    </button>
+    <button 
+      className={`tab-button ${activeTab === 'global-messages' ? 'active' : ''}`}
+      onClick={() => setActiveTab('global-messages')}
+    >
+      🌍 Global Feed
+    </button>
+    <button 
+      className={`tab-button ${activeTab === 'all-stats' ? 'active' : ''}`}
+      onClick={() => setActiveTab('all-stats')}
+    >
+      📊 All Users Stats
+    </button>
+  </div>
+)}
 
             {/* Tab Content */}
-            <main className="main-content">
-                {activeTab === 'chat' && (
-                    user ? (
-                        <div className="chat-section">
-                            {/* UserStatistics is now INSIDE the chat section, below the animation */}
-                            <div className="animation-section">
-                                <FacialExpression 
-                                    RiveComponent={RiveComponent}
-                                    currentExpression={currentExpression}
-                                    riveLoaded={riveLoaded}
-                                    setExpression={setExpression}
-                                />
-                            </div>
-                            <div className="user-stats-section">
-                                <UserStatistics />
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="landing-section">
-                            <div className="hero-content">
-                                <h1>Interactive AI Companion</h1>
-                                <p>Sign in to chat with an AI that responds with emotions and facial expressions!</p>
-                                <div className="demo-preview">
-                                    <FacialExpression 
-                                        RiveComponent={RiveComponent}
-                                        currentExpression={currentExpression}
-                                        riveLoaded={riveLoaded}
-                                        setExpression={setExpression}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    )
-                )}
+           <main className="main-content">
+  {activeTab === 'chat' && (
+    <div className="chat-section">
+      <div className="animation-section">
+        <FacialExpression 
+          RiveComponent={RiveComponent}
+          currentExpression={currentExpression}
+          riveLoaded={riveLoaded}
+          setExpression={setExpression}
+        />
+      </div>
+      <div className="user-stats-section">
+        <UserStatistics />
+      </div>
+      {/* Add leaderboard to chat section */}
+      <div className="leaderboard-section">
+        <Leaderboard />
+      </div>
+    </div>
+  )}
+  
+  {activeTab === 'global-messages' && (
+    <div className="global-messages-section">
+      <GlobalMessagesTab />
+    </div>
+  )}
+  
+  {activeTab === 'all-stats' && (
+    <div className="all-stats-section">
+      <AllUsersStatistics />
+    </div>
+  )}
+</main>
 
-                {activeTab === 'all-stats' && (
-                    <div className="all-stats-section">
-                        <AllUsersStatistics />
-                    </div>
-                )}
-            </main>
+            <IndexHelper />
 
             {/* AI Chat Tooltips - Pass TTS functions as props */}
             {activeTab === 'chat' && chatMessages.map(message => (
@@ -166,7 +174,7 @@ export default function App() {
 
             {/* Chat Input - Only show in chat tab */}
             {activeTab === 'chat' && (
-                <ChatInput 
+                <ChatInput
                     onSendMessage={handleSendMessage}
                     disabled={!user || isLoading}
                 />

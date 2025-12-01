@@ -1,0 +1,105 @@
+/* components/IndexHelper.css */
+.index-helper {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #fff3cd;
+  border: 2px solid #ffc107;
+  border-radius: 10px;
+  padding: 15px;
+  max-width: 400px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.index-helper-content h4 {
+  color: #856404;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.index-helper-content p {
+  color: #856404;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.index-list {
+  margin: 15px 0;
+  background: white;
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid #ffc107;
+}
+
+.index-item {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+}
+
+.index-item:last-child {
+  border-bottom: none;
+}
+
+.index-collection {
+  font-weight: bold;
+  color: #333;
+}
+
+.index-fields {
+  color: #666;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.index-instructions {
+  background: white;
+  padding: 12px;
+  border-radius: 6px;
+  margin: 15px 0;
+  font-size: 13px;
+  color: #333;
+}
+
+.index-instructions ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.index-instructions li {
+  margin-bottom: 4px;
+}
+
+.index-helper-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.index-helper-actions button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.index-helper-actions button:first-child {
+  background: #007bff;
+  color: white;
+}
+
+.index-helper-actions button:first-child:hover {
+  background: #0056b3;
+}
+
+.index-helper-actions button:last-child {
+  background: #6c757d;
+  color: white;
+}
+
+.index-helper-actions button:last-child:hover {
+  background: #545b62;
+}
